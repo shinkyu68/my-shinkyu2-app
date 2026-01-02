@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鍼灸国家試験 対策クイズ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #f3f4f6; font-family: sans-serif; }
+        .quiz-card { background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); padding: 20px; max-width: 600px; margin: 20px auto; }
+        .option-btn { display: block; width: 100%; text-align: left; padding: 12px; margin-bottom: 8px; border: 1px solid #d1d5db; border-radius: 8px; transition: all 0.2s; }
+        .option-btn:hover { background-color: #f9fafb; }
+        .correct { background-color: #d1fae5 !important; border-color: #10b981 !important; }
+        .wrong { background-color: #fee2e2 !important; border-color: #ef4444 !important; }
+        .explanation { margin-top: 15px; padding: 15px; background-color: #eff6ff; border-radius: 8px; display: none; }
+    </style>
+</head>
+<body>
+    <div id="app" class="p-4">
+        <div class="quiz-card">
+            <h1 class="text-xl font-bold mb-4 text-center text-blue-600">鍼灸国試クイズ (全160問)</h1>
+            <div id="quiz-container">
+                <p id="question-text" class="text-lg mb-4 font-medium"></p>
+                <div id="options-container"></div>
+                <div id="explanation-container" class="explanation">
+                    <p class="font-bold text-blue-700">【解説】</p>
+                    <p id="explanation-text" class="text-sm text-gray-700 mt-1"></p>
+                </div>
+                <button id="next-btn" class="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg font-bold hidden">次の問題へ</button>
+            </div>
+            <p id="score" class="text-center mt-4 text-sm text-gray-500"></p>
+        </div>
+    </div>
+
+    <script>
+        // 160問分のデータ（例として一部掲載、実際はここに全データを流し込めます）
+        const quizData = [
+            { q: "東洋医学で「気」の推動作用が低下した時に現れやすい症状は？", a: ["冷え", "倦怠感", "むくみ", "出血"], c: 1, e: "推動作用は成長や発育、血液の循環を促す力です。これが低下すると新陳代謝が落ち、強い疲れ（倦怠感）を感じやすくなります。" },
+            { q: "足の陽明胃経の終止穴はどこか？", a: ["隠白", "大敦", "厲兌", "至陰"], c: 2, e: "胃経の終点（終止穴）は足の第2指外側爪甲根部にある「厲兌（れいだ）」です。" },
+            // ... (ここに160問分追加可能)
+        ];
+
+        let currentIndex = 0;
+        let score = 0;
+
+        const qText = document.getElementById('question-text');
+        const optContainer = document.getElementById('options-container');
+        const expContainer = document.getElementById('explanation-container');
+        const expText = document.getElementById('explanation-text');
+        const nextBtn = document.getElementById('next-btn');
+        const scoreText = document.getElementById('score');
+
+        function loadQuestion() {
+            const current = quizData[currentIndex];
+            qText.innerText = `問${currentIndex + 1}: ${current.q}`;
+            optContainer.innerHTML = '';
+            expContainer.style.display = 'none';
+            nextBtn.classList.add('hidden');
+            scoreText.innerText = `現在: ${currentIndex} / ${quizData.length}問終了`;
+
+            current.a.forEach((option, index) => {
+                const btn = document.createElement('button');
+                btn.innerText = option;
+                btn.className = 'option-btn';
+                btn.onclick = () => checkAnswer(index);
+                optContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selected) {
+            const current = quizData[currentIndex];
+            const buttons = optContainer.getElementsByTagName('button');
+            
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = true;
+                if (i === current.c) buttons[i].classList.add('correct');
+                if (i === selected && i !== current.c) buttons[i].classList.add('wrong');
+            }
+
+            expText.innerText = current.e;
+            expContainer.style.display = 'block';
+            nextBtn.classList.remove('hidden');
+        }
+
+        nextBtn.onclick = () => {
+            currentIndex++;
+            if (currentIndex < quizData.length) {
+                loadQuestion();
+            } else {
+                alert(`お疲れ様でした！全問終了です。`);
+                currentIndex = 0;
+                loadQuestion();
+            }
+        };
+
+        loadQuestion();
+    </script>
+</body>
+</html>
